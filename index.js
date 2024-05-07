@@ -1,123 +1,188 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const mysql = require('mysql');
+const express = require("express");
+const bodyParser = require("body-parser");
+const mysql = require("mysql");
+
 const app = express();
-
-app.listen(3000, () => console.log('Server running on port 3000'));
-
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-})
+app.use(bodyParser());
 
 const connection = mysql.createConnection({
-    host: 'localhost',
+    host: "localhost",
+    user: "root",
     port: 3307,
-    user: 'root',
-    password: '',
-    database: 'forms'
-})
+    password: "",
+    database: "forms"
+});
 
 connection.connect((err) => {
     if (err) throw err;
-    console.log('Connected to MySQL database');
+    console.log("Connected successfully to MySql server")
+});
+
+
+app.get("/", (req, res) => {
+    res.send("Hello From The Server");
 })
 
-app.use(bodyParser())
-app.post('/people', (req, res) => {
+
+function validateFName(fname) {
+    let errors = [];
+    if (fname.length == 0) {
+        errors.push("First Name Is Null");
+    }
+
+    if (fname.length > 50) {
+        errors.push("First Name Length Can Not Exceed 50 Characters.");
+    }
+
+    return errors;
+}
+
+function validateLName(lname) {
+    let errors = [];
+    if (lname.length == 0) {
+        errors.push("Last Name Is Null");
+    }
+
+    if (lname.length > 50) {
+        errors.push("Last Name Length Can Not Exceed 50 Characters.");
+    }
+
+    return errors;
+}
+
+function validateBairro(bairro) {
+    let errors = []
+    if(!bairro || bairro.length === 0) {
+        errors.push("Bairro é Null")
+    }
     
+    return errors
+}
+
+function validateRua(rua){
+    let errors = []
+    if(!rua || rua.length === 0) {
+        errors.push("Rua é Null")
+    }
+
+    //verificar se o comprimento da rua for maior que 100? opcional
+    // if(rua.length > 100){
+    //     errors.push("Rua deve ter no maximo 100 caracteres")
+    // }
+
+    return errors
+}
+
+function validateIdade(idade) {
+    let errors = [];
+
+    // checks whether age is null or not
+    if (!idade && idade !== 0) {
+        errors.push("Idade é Null");
+    }
+
+    // checks whether age is an integer or not
+    if (!Number.isInteger(idade)) {
+        errors.push("Idade deve ser um número inteiro");
+    }
+
+    return errors;
+}
+
+function validateEstado(estado) {
+    let errors = [];
+    if (estado.length == 0) {
+        errors.push("Estado Is Null");
+    }
+
+    if (estado > 27) {
+        errors.push("Estado invalido");
+    }
+
+    return errors;
+}
+
+function validateBiografia(biografia) {
+    let errors = [];
+    if(!biografia || biografia.length === 0){
+        errors.push("Biografia é Null")
+    }
+    return errors;
+}
+
+
+app.post("/api/students", (req, res) => {
+    console.log("Requesey..	");
+    let fname = req.body.fname;
+    let lname = req.body.lname;
+    let idade = req.body.idade;
+    let rua = req.body.rua;
+    let bairro = req.body.bairro;
+    let estado = req.body.estado;
+    let biografia = req.body.biografia;
+
+    let errFName = validateFName(fname); // will validate first name
+    let errLName = validateLName(lname); // will validate last name
+    let errIdade = validateIdade(idade); // will validate idade
+    let errRua = validateRua(rua); // will validate rua
+    let errBairro = validateBairro(bairro); // will validate bairro
+    let errEstado = validateEstado(estado); // will validate estado
+    let errBiografia = validateBiografia(biografia); // will validate biografia
+
+    if (errFName.length || errLName.length || errIdade.length || errRua.length || errBairro.length || errEstado.length || errBiografia.length) {
+        res.json(200, {
+            msg: "Validation Failed",
+            errors: {
+                fname: errFName,
+                lname: errLName,
+                idade: errIdade,
+                rua: errRua,
+                bairro: errBairro,
+                estado: errEstado,
+                biografia: errBiografia
+            }
+        });
+    }
+    else {
+        let query = `INSERT INTO STUDENTS (fname, lname, bairro, rua, idade, estado, biografia) VALUES ('${fname}', '${lname}', '${bairro}', '${rua}', '${idade}', '${estado}', '${biografia}')`;
+
+        connection.query(query, (err, result) => {
+            if (err) {
+                // status code 500 is for Internal Server Error
+                res.json(500, {
+                    msg: "Some thing went wrong please try again"
+                })
+            }
+
+            // if we reach till this point means record is inserted succesfully
+
+
+            res.json(200, {
+                msg: "Student Registered Succesfully",
+            })
+        })
+
+    }
+});
+
+
+app.get("/api/students", (req, res) => {
+    let query = "SELECT * FROM STUDENTS";
+
+    connection.query(query, (err, result) => {
+        if (err) {
+            res.json(500, {
+                msg: "Internal Server Error Please Try Again"
+            })
+        }
+
+        res.send(200, {
+            msg: "All the data fetched successfully",
+            data: result
+        })
+    })
 })
 
-let fname = req.body.fname;
-let lname = req.body.lname;
-let email = req.body.email;
-let contactno = req.body.contactno;
-let birthdate = req.body.birthdate;
-let semester = req.body.semester;
-
-function validadeName(lname){
-    let erros = []
-    if(lname.length == 0){
-        erros.push('Last name is null')
-    }
-
-    if(lname.length > 50){
-        erros.push('Last name length can not exceed 50 characters')
-    }
-
-    return erros
-}
-
-function validateBirthDate(date) {
-    let errors = [];
-    if (date === undefined || date === "") {
-        errors.push("Birth Date is Null");
-    }
-    return errors;
-}
-
-function validateContactNo(contactno) {
-    let errors = [];
-
-    // check whether contact no is empty or not
-    if (contactno.length == 0) {
-        errors.push("Contact Number Is Null");
-    }
-
-    // cheaks whether contact no length is less then 10 character
-    if (contactno.length < 10) {
-        errors.push("Contact Number Must Be Of 10 Digits");
-    }
-
-    // checks whether contact no length is more then 10 character
-    if (contactno.length > 10) {
-        errors.push("Contact No Must Be of 10 Digits");
-    }
-
-    // Using regular expression check whether contactno is only containing digits or not
-    if (!(/[0-9]/g.test(contactno))) {
-        errors.push("Contact Number Must Contain Digits Only");
-    }
-
-    return errors;
-}
-function validateEmail(email) {
-    let errors = [];
-
-    // checks whether email is empty or not
-    if (email.length == 0) {
-        errors.push("Email Is Null");
-    }
-
-    // checks whether email length is more then 100 or not
-    if (email.length > 100) {
-        errors.push("Email Can not exceed 100 Character");
-    }
-
-    // checks whether email is valid or not usinf regular expression
-    if (!(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/g.test(email))) {
-        errors.push("Email Is Not Valid");
-    }
-
-    return errors;
-}
-
-function validateSemester(semester) {
-    let errors = [];
-    if (semester.length == 0) {
-        errors.push("Semester Is Null");
-    }
-
-    if (semester > 8) {
-        errors.push("Invalid Semester");
-    }
-
-    return errors;
-}
-
-function validateCourse(course) {
-    let errors = [];
-    if (course !== "B.Tech Computer Engineering" && course !== "B.Tech Information Technology") {
-        errors.push("Invalid Course");
-    }
-    return errors;
-}
+app.listen(3000, () => {
+    console.log("Server started ...");
+});
