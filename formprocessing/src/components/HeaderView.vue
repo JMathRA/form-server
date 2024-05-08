@@ -1,7 +1,7 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-      <div class="navbar-brand" href="#">Student's Portal</div>
+      <div class="navbar-brand" href="#">Student´s Portal</div>
       <button
         class="navbar-toggler"
         type="button"
@@ -17,12 +17,12 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
             <router-link class="nav-link active" aria-current="page" to="/"
-              >Home</router-link
+              >Inicio</router-link
             >
           </li>
           <li class="nav-item">
             <router-link class="nav-link active" aria-current="page" to="/show"
-              >Show</router-link
+              >Mostrar dados</router-link
             >
           </li>
         </ul>

@@ -1,7 +1,7 @@
 <template>
-  <footer class="footer py-3 bg-dark" style="position: absolute; bottom:0px; left: 0px; width: 100%;">
+  <footer class="footer fixed" style="position: absolute; bottom:0px; left: 0px; width: 100%;">
     <div class="container">
-      <span class="text-muted">Copyrighted by Charusat.</span>
+      <span class="text-muted">João Matheus - 2024</span>
     </div>
   </footer>
 </template>

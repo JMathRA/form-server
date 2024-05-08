@@ -183,6 +183,31 @@ app.get("/api/students", (req, res) => {
     })
 })
 
+app.put("/api/students", (req, res) => {
+    const studentId =req.params.id;
+    const { fname, lname, bairro, rua, idade, estado, biografia } = req.body;
+    if(!studentId){
+        return res.status(400).json({ msg: "ID do aluno não fornecido" });
+    }
+
+    const query = `
+    UPDATE STUDENTS
+    SET fname=?, lname=?, idade=?, rua=?, bairro=?, estado=?, biografia=?
+    WHERE id=?`
+
+    const values = [fname, lname, idade, rua, bairro, estado, biografia, studentId];
+
+    connection.query(query, values, (err, result) => {
+        if (err) {
+            console.error("Erro ao atualizar aluno:", err);
+            return res.status(500).json({ msg: "Falha ao atualizar aluno" });
+        } else {
+            console.log("Aluno atualizado com sucesso.");
+            return res.status(200).json({ msg: "Aluno atualizado com sucesso" });
+        }
+    });
+})
+
 app.listen(3000, () => {
     console.log("Server started ...");
 });
