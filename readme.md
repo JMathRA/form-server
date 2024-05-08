@@ -12,12 +12,13 @@ CREATE TABLE STUDENTS (
   	biografia varchar(500)
 )
 
-apos a criação da tabela rode npm install na pasta Form-Server
+# Instalação e Execução
+1. Abra o terminal e navegue até a pasta Form-Server.
+2. Execute o comando npm install para instalar as dependências do servidor.
+3. Inicie o servidor executando o comando node index.js.
+## Agora o backend estará rodando e conectado ao seu banco de dados MySQL.
 
-depois rode o comando npm install dentro da pasta formprocessing
-
-apos isso poderar executar o front e backend em seu servidor
-
-user o comando node index.js para iniciar o back-end
-
-use o comando npm run serve para iniciar o front-end
+# Abra outro terminal e navegue até a pasta formprocessing.
+1. Execute o comando npm install para instalar as dependências do frontend.
+2. Inicie o frontend executando o comando npm run serve.
+## Agora você pode acessar a aplicação através do navegador em http://localhost:8080.
